@@ -7,11 +7,14 @@
 ################################################
 . /etc/dynv6.conf
 
-if [ -z "$timeout" ]; then
+
     timeout=10;
 fi
 
-ipURL="http://ifconfig.me"
+if [ -z "$ipURL" ]; then
+    ipURL="http://ifconfig.me"
+fi
+
 updtURL="http://dynv6.com/api/update"
 
 
