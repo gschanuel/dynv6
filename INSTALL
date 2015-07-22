@@ -1,0 +1,5 @@
+To install, just copy dynv6 to /bin and change chmod 755
+Copy dynv6.conf to /etc/
+to use, just run dynv6
+sample crontab line:
+*/10    *       *       *       *       /bin/noip >> /var/log/noip.log

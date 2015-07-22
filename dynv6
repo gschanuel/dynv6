@@ -1,0 +1,113 @@
+#!/bin/bash
+################################################
+#
+# Update script to Dynv6.net
+# by gschanuel
+#
+################################################
+. /etc/dynv6.conf
+
+if [ -z "$timeout" ]; then
+    timeout=10;
+fi
+
+ipURL="http://ifconfig.me"
+updtURL="http://dynv6.com/api/update"
+
+
+logline(){
+    echo -n "$(date +'%b %e %X') $(hostname) dynv6: $1"
+}
+
+errorOK(){
+    if [ $? -eq 0 ]; then
+        echo -n ". OK "; [ $1 ] && echo $* || echo ""
+	isok=""
+    else
+        echo ". ERROR ($?)"
+	isok=""
+	error=""
+    fi
+}
+
+if [ -n $dynv6ipv4 ]; then
+    logline 
+    echo -n "Finding current IPv4 .." 
+    if [ "$dynv6ipv4" = "auto" ];then
+        currentipv4=$(curl -m $timeout -s -L $ipURL)
+    else
+        currentipv4=$dynv6ipv4
+    fi
+    errorOK $currentipv4
+
+    logline
+    echo -n "Finding Old IPv4 .."
+    oldipv4=$(cat /tmp/dynv6.ipv4)
+    errorOK $oldipv4
+
+    logline
+    if [ "$currentipv4" != "$oldipv4" ] && [ -n $currentipv4 ]; then
+        echo -n "Updating IPv4 record on server .."
+        status=$(curl -m $timeout -s "$updtURL?hostname=$hostname&ipv4=$dynv6ipv4&token=$token")
+        errorOK $status
+        case "$status" in
+            'host updated')
+            logline
+            echo -n "IPv4 address updated .."
+            echo $currentipv4 > /tmp/dynv6.ipv4
+            errorOK $currentipv4
+            ;;
+        'invalid authentication_token')
+            logline
+            echo -n "Invalid Token."
+            ;;
+        'invalid host')
+            logline
+            echo -n "Invalid Host."
+            ;;
+        esac
+    else
+        echo "IPv4 address unchanged!"
+    fi
+fi
+
+if [ -n $ipv6 ]; then
+    logline
+    echo -n "Finding current IPv6.."
+    if [ "$dynv6ipv6" = "auto" ];then
+        currentipv6=$(ip -6 addr list scope global | grep -v " fd" | sed -n 's/.*inet6 \([0-9a-f:]\+\).*/\1/p' | head -n 1)
+    else
+        currentipv6=$dynv6ipv6
+    fi
+    errorOK $currentipv6
+
+    logline
+    echo -n "Finding Old IPv6 .."
+    oldipv6=$(cat /tmp/dynv6.ipv6)
+    errorOK $oldipv6
+
+    logline
+    if [ "$currentipv6" != "$oldipv6" ] && [ -n $currentipv6 ]; then
+        echo -n "Updating IPv6 record on server .."
+        status=$(curl -m $timeout -s "$updtURL?hostname=$hostname&ipv6=$currentipv6&token=$token")
+        errorOK $status
+        case "$status" in
+            'host updated')
+            logline
+            echo -n "IPv6 address updated .."
+            echo $currentipv6 > /tmp/dynv6.ipv6
+            errorOK $currentipv6
+            ;;
+        'invalid authentication_token')
+            logline
+            echo -n "Invalid Token."
+            ;;
+        'invalid host')
+            logline
+            echo -n "Invalid Host."
+            ;;
+        esac
+    else
+        echo "IPv6 address unchanged!"
+    fi
+fi
