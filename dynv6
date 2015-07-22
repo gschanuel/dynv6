@@ -8,6 +8,7 @@
 . /etc/dynv6.conf
 
 
+if [ -z "$timeout" ]; then
     timeout=10;
 fi
 
