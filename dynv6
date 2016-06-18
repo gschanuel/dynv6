@@ -52,7 +52,7 @@ if [ -n $dynv6ipv4 ]; then
     logline
     if [ "$currentipv4" != "$oldipv4" ] && [ -n $currentipv4 ]; then
         echo -n "Updating IPv4 record on server .."
-        status=$(curl -m $timeout -s "$updtURL4?hostname=$hostname&ipv4=$dynv6ipv4&token=$token")
+        status=$(curl -m $timeout -s "$updtURL4?hostname=$hostname&ipv4=$currentipv4&token=$token")
         errorOK $status
         case "$status" in
             'host updated')
