@@ -20,7 +20,7 @@ updtURL="http://dynv6.com/api/update"
 updtURL4="http://ipv4.dynv6.com/api/update"
 
 logline(){
-    echo -n "$(date +'%b %e %X') $(hostname) dynv6: $1"
+    echo -n "$(date +'%b %e %X') $hostname dynv6: $1"
 }
 
 errorOK(){
