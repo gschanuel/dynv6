@@ -79,7 +79,8 @@ if [ -n $ipv6 ]; then
     logline
     echo -n "Finding current IPv6.."
     if [ "$dynv6ipv6" = "auto" ];then
-        currentipv6=$(ip -6 addr list scope global | grep -v " fd" | sed -n 's/.*inet6 \([0-9a-f:]\+\).*/\1/p' | head -n 1)
+#        currentipv6=$(ip -6 addr list scope global | grep -v " fd" | sed -n 's/.*inet6 \([0-9a-f:]\+\).*/\1/p' | head -n 1)
+	currentipv6=$(curl -s  http://ip6only.me/api/ | sed -n 's/IPv6,\([0-9a-f:]\+\).*/\1/p' )
     else
         currentipv6=$dynv6ipv6
     fi
