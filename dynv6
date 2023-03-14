@@ -13,11 +13,11 @@ if [ -z "$timeout" ]; then
 fi
 
 if [ -z "$ipURL" ]; then
-    ipURL="https://ifconfig.me"
+    ipURL="http://ifconfig.me"
 fi
 
-updtURL="https://dynv6.com/api/update"
-updtURL4="https://ipv4.dynv6.com/api/update"
+updtURL="http://dynv6.com/api/update"
+updtURL4="http://ipv4.dynv6.com/api/update"
 
 logline(){
     echo -n "$(date +'%b %e %X') $hostname dynv6: $1"
@@ -79,7 +79,9 @@ if [ -n $ipv6 ]; then
     logline
     echo -n "Finding current IPv6.."
     if [ "$dynv6ipv6" = "auto" ];then
-	currentipv6=$(curl -s https://ip6only.me/api/ | sed -n 's/IPv6,\([0-9a-f:]\+\).*/\1/p' )
+	currentipv6=$(ip addr show scope global | grep -v deprecated | grep -A1 'inet6 [^f:]' \
+	| sed -nr ':a;N;s#^ +inet6 ([a-f0-9:]+)/.+? scope global .*? valid_lft ([0-9]+sec) .*#\2 \1#p;Ta' \
+	| sort -nr | head -1 | cut -d ' ' -f2)
     else
         currentipv6=$dynv6ipv6
     fi
