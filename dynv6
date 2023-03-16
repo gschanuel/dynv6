@@ -55,7 +55,7 @@ if [ -n $dynv6ipv4 ]; then
         status=$(curl -m $timeout -s "$updtURL4?hostname=$hostname&ipv4=$currentipv4&token=$token")
         errorOK $status
         case "$status" in
-            'addresses updated' | 'host updated')
+            *updated)
             logline
             echo -n "IPv4 address updated .."
             echo $currentipv4 > /tmp/dynv6.ipv4
@@ -98,7 +98,7 @@ if [ -n $ipv6 ]; then
         status=$(curl -m $timeout -s "$updtURL?hostname=$hostname&ipv6=$currentipv6&token=$token")
         errorOK $status
         case "$status" in
-            'addresses updated' | 'host updated')
+            *updated)
             logline
             echo -n "IPv6 address updated .."
             echo $currentipv6 > /tmp/dynv6.ipv6
