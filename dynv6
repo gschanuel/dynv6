@@ -55,7 +55,7 @@ if [ -n $dynv6ipv4 ]; then
         status=$(curl -m $timeout -s "$updtURL4?hostname=$hostname&ipv4=$currentipv4&token=$token")
         errorOK $status
         case "$status" in
-            'host updated')
+            *updated)
             logline
             echo -n "IPv4 address updated .."
             echo $currentipv4 > /tmp/dynv6.ipv4
@@ -79,7 +79,9 @@ if [ -n $ipv6 ]; then
     logline
     echo -n "Finding current IPv6.."
     if [ "$dynv6ipv6" = "auto" ];then
-	currentipv6=$(curl -s https://ip6only.me/api/ | sed -n 's/IPv6,\([0-9a-f:]\+\).*/\1/p' )
+	currentipv6=$(ip addr show scope global | grep -v deprecated | grep -A1 'inet6 [^f:]' \
+	| sed -nr ':a;N;s#^ +inet6 ([a-f0-9:]+)/.+? scope global .*? valid_lft ([0-9]+sec) .*#\2 \1#p;Ta' \
+	| sort -nr | head -1 | cut -d ' ' -f2)
     else
         currentipv6=$dynv6ipv6
     fi
@@ -96,7 +98,7 @@ if [ -n $ipv6 ]; then
         status=$(curl -m $timeout -s "$updtURL?hostname=$hostname&ipv6=$currentipv6&token=$token")
         errorOK $status
         case "$status" in
-            'host updated')
+            *updated)
             logline
             echo -n "IPv6 address updated .."
             echo $currentipv6 > /tmp/dynv6.ipv6
