@@ -13,7 +13,7 @@ if [ -z "$timeout" ]; then
 fi
 
 if [ -z "$ipURL" ]; then
-    ipURL="https://ifconfig.me"
+    ipURL="http://ifconfig.me"
 fi
 
 updtURL="https://dynv6.com/api/update"
