@@ -16,6 +16,9 @@ if [ -z "$ipURL" ]; then
     ipURL="http://ifconfig.me"
 fi
 
+[ -z "$dynv6ipv4" ] && dynv6ipv4='-'
+[ -z "$dynv6ipv6" ] && dynv6ipv6=auto
+
 updtURL="https://dynv6.com/api/update"
 updtURL4="https://ipv4.dynv6.com/api/update"
 
