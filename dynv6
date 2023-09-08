@@ -99,7 +99,7 @@ if [ -n $ipv6 ]; then
     logline
     if [ "$currentipv6" != "$oldipv6" ] && [ -n $currentipv6 ]; then
         echo -n "Updating IPv6 record on server .."
-        status=$(curl -m $timeout -s "$updtURL?hostname=$hostname&ipv6=$currentipv6&token=$token")
+        status=$(curl -m $timeout -s "$updtURL?hostname=$hostname&ipv6=$currentipv6/64&token=$token")
         errorOK $status
         case "$status" in
             *updated)
