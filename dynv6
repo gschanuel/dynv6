@@ -49,7 +49,7 @@ if [ -n $dynv6ipv4 ]; then
 
     logline
     echo -n "Finding Old IPv4 .."
-    oldipv4=$(cat /tmp/dynv6.ipv4)
+    oldipv4=$(dig $hostname A +short)
     errorOK $oldipv4
 
     logline
@@ -61,7 +61,6 @@ if [ -n $dynv6ipv4 ]; then
             *updated)
             logline
             echo -n "IPv4 address updated .."
-            echo $currentipv4 > /tmp/dynv6.ipv4
             errorOK $currentipv4
             ;;
         'invalid authentication_token')
@@ -93,7 +92,7 @@ if [ -n $ipv6 ]; then
 
     logline
     echo -n "Finding Old IPv6 .."
-    oldipv6=$(cat /tmp/dynv6.ipv6)
+    oldipv6=$(dig $hostname AAAA +short)
     errorOK $oldipv6
 
     logline
@@ -105,7 +104,6 @@ if [ -n $ipv6 ]; then
             *updated)
             logline
             echo -n "IPv6 address updated .."
-            echo $currentipv6 > /tmp/dynv6.ipv6
             errorOK $currentipv6
             ;;
         'invalid authentication_token')
