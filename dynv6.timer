@@ -1,0 +1,10 @@
+[Unit]
+Description=Runs dynv6 after boot
+
+[Timer]
+OnUnitActiveSec=1h
+OnBootSec=3m
+Unit=dynv6-timer.service
+
+[Install]
+WantedBy=multi-user.target
