@@ -81,10 +81,10 @@ if [ -n $ipv6 ]; then
     logline
     echo -n "Finding current IPv6.."
     if [ "$dynv6ipv6" = "auto" ];then
-#	currentipv6=$(ip addr show scope global | grep -v deprecated | grep -A1 'inet6 [^f:]' \
-#	| sed -nr ':a;N;s#^ +inet6 ([a-f0-9:]+)/.+? scope global .*? valid_lft ([0-9]+sec) .*#\2 \1#p;Ta' \
-#	| sort -nr | head -1 | cut -d ' ' -f2)
-	currentipv6=$(ip -6 addr list scope global  | grep -v " fd" | sed -n 's/.*inet6 \([0-9a-f:]\+\).*/\1/p' | head -n 1)
+	currentipv6=$(/usr/sbin/ip addr show scope global | grep -v deprecated | grep -A1 'inet6 [^f:]' \
+	| sed -nr ':a;N;s#^ +inet6 ([a-f0-9:]+)/.+? scope global .*? valid_lft ([0-9]+sec) .*#\2 \1#p;Ta' \
+	| sort -nr | head -1 | cut -d ' ' -f2)
+#	currentipv6=$(ip -6 addr list scope global  | grep -v " fd" | sed -n 's/.*inet6 \([0-9a-f:]\+\).*/\1/p' | head -n 1)
     else
         currentipv6=$dynv6ipv6
     fi
