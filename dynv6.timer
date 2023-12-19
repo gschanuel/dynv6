@@ -3,7 +3,7 @@ Description=Runs dynv6 after boot
 
 [Timer]
 OnUnitActiveSec=1h
-OnBootSec=3m
+OnBootSec=1m
 Unit=dynv6-timer.service
 
 [Install]
