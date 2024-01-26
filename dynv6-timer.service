@@ -3,3 +3,7 @@ Description=Dynv6 Timer
 
 [Service]
 ExecStart=/usr/local/bin/dynv6
+
+[Install]
+WantedBy=timers.target
+
