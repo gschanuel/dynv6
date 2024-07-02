@@ -16,8 +16,11 @@ if [ -z "$ipURL" ]; then
     ipURL="http://ifconfig.me"
 fi
 
-updtURL="http://dynv6.com/api/update"
-updtURL4="http://ipv4.dynv6.com/api/update"
+[ -z "$dynv6ipv4" ] && dynv6ipv4='-'
+[ -z "$dynv6ipv6" ] && dynv6ipv6=auto
+
+updtURL="https://dynv6.com/api/update"
+updtURL4="https://ipv4.dynv6.com/api/update"
 
 logline(){
     echo -n "$(date +'%b %e %X') $hostname dynv6: $1"
@@ -46,7 +49,7 @@ if [ -n $dynv6ipv4 ]; then
 
     logline
     echo -n "Finding Old IPv4 .."
-    oldipv4=$(cat /tmp/dynv6.ipv4)
+    oldipv4=$(dig $hostname A +short)
     errorOK $oldipv4
 
     logline
@@ -55,10 +58,9 @@ if [ -n $dynv6ipv4 ]; then
         status=$(curl -m $timeout -s "$updtURL4?hostname=$hostname&ipv4=$currentipv4&token=$token")
         errorOK $status
         case "$status" in
-            'host updated')
+            *updated)
             logline
             echo -n "IPv4 address updated .."
-            echo $currentipv4 > /tmp/dynv6.ipv4
             errorOK $currentipv4
             ;;
         'invalid authentication_token')
@@ -79,7 +81,10 @@ if [ -n $ipv6 ]; then
     logline
     echo -n "Finding current IPv6.."
     if [ "$dynv6ipv6" = "auto" ];then
-        currentipv6=$(ip -6 addr list scope global | grep -v " fd" | sed -n 's/.*inet6 \([0-9a-f:]\+\).*/\1/p' | head -n 1)
+	currentipv6=$(/usr/sbin/ip -6 addr show scope global | grep -A1 'inet6 2' \
+	| sed -nr ':a;N;s#^ +inet6 ([a-f0-9:]+)/.+? scope global .*? preferred_lft ([0-9]+sec)#\2 \1#p;Ta' \
+	| sort -nr | head -1 | cut -d ' ' -f2)
+#	currentipv6=$(ip -6 addr list scope global  | grep -v " fd" | sed -n 's/.*inet6 \([0-9a-f:]\+\).*/\1/p' | head -n 1)
     else
         currentipv6=$dynv6ipv6
     fi
@@ -87,19 +92,18 @@ if [ -n $ipv6 ]; then
 
     logline
     echo -n "Finding Old IPv6 .."
-    oldipv6=$(cat /tmp/dynv6.ipv6)
+    oldipv6=$(dig $hostname AAAA +short)
     errorOK $oldipv6
 
     logline
     if [ "$currentipv6" != "$oldipv6" ] && [ -n $currentipv6 ]; then
         echo -n "Updating IPv6 record on server .."
-        status=$(curl -m $timeout -s "$updtURL?hostname=$hostname&ipv6=$currentipv6&token=$token")
+        status=$(curl -m $timeout -s "$updtURL?hostname=$hostname&ipv6=$currentipv6/64&token=$token")
         errorOK $status
         case "$status" in
-            'host updated')
+            *updated)
             logline
             echo -n "IPv6 address updated .."
-            echo $currentipv6 > /tmp/dynv6.ipv6
             errorOK $currentipv6
             ;;
         'invalid authentication_token')
