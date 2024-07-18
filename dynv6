@@ -41,7 +41,7 @@ if [ -n $dynv6ipv4 ]; then
     logline 
     echo -n "Finding current IPv4 .." 
     if [ "$dynv6ipv4" = "auto" ];then
-        currentipv4=$(curl -m $timeout -s -L $ipURL)
+        currentipv4=$(curl -4 -m $timeout -s -L $ipURL)
     else
         currentipv4=$dynv6ipv4
     fi
@@ -49,11 +49,11 @@ if [ -n $dynv6ipv4 ]; then
 
     logline
     echo -n "Finding Old IPv4 .."
-    oldipv4=$(dig $hostname A +short)
+    oldipv4=$(dig $hostname A +short @ns1.dynv6.com)
     errorOK $oldipv4
 
     logline
-    if [ "$currentipv4" != "$oldipv4" ] && [ -n $currentipv4 ]; then
+    if [ "$currentipv4" != "$oldipv4" ] && [ -n "$currentipv4" ]; then
         echo -n "Updating IPv4 record on server .."
         status=$(curl -m $timeout -s "$updtURL4?hostname=$hostname&ipv4=$currentipv4&token=$token")
         errorOK $status
@@ -77,14 +77,11 @@ if [ -n $dynv6ipv4 ]; then
     fi
 fi
 
-if [ -n $ipv6 ]; then
-    logline
-    echo -n "Finding current IPv6.."
+if [ -n $dynv6ipv6 ]; then
+    logline 
+    echo -n "Finding current IPv6 .." 
     if [ "$dynv6ipv6" = "auto" ];then
-	currentipv6=$(/usr/sbin/ip -6 addr show scope global | grep -A1 'inet6 2' \
-	| sed -nr ':a;N;s#^ +inet6 ([a-f0-9:]+)/.+? scope global .*? preferred_lft ([0-9]+sec)#\2 \1#p;Ta' \
-	| sort -nr | head -1 | cut -d ' ' -f2)
-#	currentipv6=$(ip -6 addr list scope global  | grep -v " fd" | sed -n 's/.*inet6 \([0-9a-f:]\+\).*/\1/p' | head -n 1)
+        currentipv6=$(curl -6 -m $timeout -s -L $ipURL)
     else
         currentipv6=$dynv6ipv6
     fi
@@ -92,13 +89,13 @@ if [ -n $ipv6 ]; then
 
     logline
     echo -n "Finding Old IPv6 .."
-    oldipv6=$(dig $hostname AAAA +short)
+    oldipv6=$(dig $hostname AAAA +short @ns1.dynv6.com)
     errorOK $oldipv6
 
     logline
-    if [ "$currentipv6" != "$oldipv6" ] && [ -n $currentipv6 ]; then
+    if [ "$currentipv6" != "$oldipv6" ] && [ -n "$currentipv6" ]; then
         echo -n "Updating IPv6 record on server .."
-        status=$(curl -m $timeout -s "$updtURL?hostname=$hostname&ipv6=$currentipv6/64&token=$token")
+        status=$(curl -m $timeout -s "$updtURL?hostname=$hostname&ipv6=$currentipv6&token=$token")
         errorOK $status
         case "$status" in
             *updated)
