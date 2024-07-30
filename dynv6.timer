@@ -2,9 +2,9 @@
 Description=Runs dynv6 after boot
 
 [Timer]
-OnUnitActiveSec=1h
+OnUnitActiveSec=10m
 OnBootSec=1m
-Unit=dynv6-timer.service
+Unit=dynv6.service
 
 [Install]
 WantedBy=multi-user.target
